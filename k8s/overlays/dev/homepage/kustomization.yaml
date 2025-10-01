@@ -1,8 +1,7 @@
 # k8s/overlays/dev/homepage/kustomization.yaml
 resources:
   - ../../../base/homepage
-  # Optional middleware file can be referenced directly if you use it:
-  # - ../../../base/traefik/middleware-headers.yaml
+  - ../../../base/traefik/middleware-headers.yaml
 
 patches:
   - path: patch-service-nodeport.yaml
