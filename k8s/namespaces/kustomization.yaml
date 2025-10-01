@@ -1,0 +1,7 @@
+# k8s/namespaces/kustomization.yaml
+resources:
+  - homepage.yaml
+  # add more namespaces here as you create them, e.g.:
+  # - cert-manager.yaml
+  # - monitoring.yaml
+

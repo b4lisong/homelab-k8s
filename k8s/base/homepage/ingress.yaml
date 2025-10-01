@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: homepage
+  namespace: homepage
+  annotations:
+    # Optional: attach Traefik middleware (remove this line if you didn't add it)
+    traefik.ingress.kubernetes.io/router.middlewares: "homepage-secure-headers@kubernetescrd"
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: home.bh.zz
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: homepage
+            port:
+              number: 80
+

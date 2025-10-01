@@ -1,0 +1,7 @@
+resources:
+  - ../../../base/homepage
+  - ../../../base/traefik/middleware-headers.yaml  # remove if not using the middleware
+
+patchesStrategicMerge:
+  - patch-ingress-host.yaml
+
