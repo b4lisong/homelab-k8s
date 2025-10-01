@@ -66,3 +66,10 @@ data:
 
   docker.yaml: |
     ---
+
+  proxmox.yaml: |
+    ---
+
+  custom.css: ""
+
+  custom.js: ""
