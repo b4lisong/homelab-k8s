@@ -32,6 +32,12 @@ data:
 
   widgets.yaml: |
     ---
+    - resources:
+        backend: kubernetes
+        expanded: true
+        cpu: true
+        memory: true
+
     - search:
         provider: google
         target: _blank
