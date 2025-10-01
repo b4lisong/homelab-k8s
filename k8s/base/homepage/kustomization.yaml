@@ -4,5 +4,4 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
-  - middleware-headers.yaml
 
