@@ -15,10 +15,17 @@ spec:
     spec:
       containers:
       - name: homepage
-        image: ghcr.io/gethomepage/homepage:latest
-        imagePullPolicy: Always
+        image: ghcr.io/gethomepage/homepage:v1.5.0
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
         env:
         - name: HOMEPAGE_TITLE
           value: "My Homelab"
@@ -29,6 +36,6 @@ spec:
           mountPath: /app/config
       volumes:
       - name: config
-        persistentVolumeClaim:
-          claimName: homepage-config
+        configMap:
+          name: homepage-config
 
