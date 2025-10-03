@@ -1,0 +1,11 @@
+# k8s/base/homepage/kustomization.yaml
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+

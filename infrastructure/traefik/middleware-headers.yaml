@@ -1,0 +1,12 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: secure-headers
+  namespace: homepage
+spec:
+  headers:
+    contentTypeNosniff: true
+    browserXssFilter: true
+    frameDeny: true
+    referrerPolicy: no-referrer-when-downgrade
+

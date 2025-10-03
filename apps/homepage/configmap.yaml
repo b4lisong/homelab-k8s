@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage-config
+  namespace: homepage
+data:
+  settings.yaml: |
+    title: My Homelab
+    favicon: https://github.com/gethomepage.png
+
+    headerStyle: boxed
+    statusStyle: dot
+
+    layout:
+      - Services:
+          style: row
+          columns: 3
+      - Infrastructure:
+          style: row
+          columns: 3
+      - Media:
+          style: row
+          columns: 3
+
+  services.yaml: |
+    ---
+    - Services:
+        - Homepage:
+            href: http://home.bh.zz
+            description: This dashboard
+            icon: homepage.png
+
+  widgets.yaml: |
+    ---
+    - resources:
+        backend: kubernetes
+        expanded: true
+        cpu: true
+        memory: true
+
+    - search:
+        provider: google
+        target: _blank
+
+    - datetime:
+        text_size: xl
+        format:
+          timeStyle: short
+          dateStyle: short
+
+  bookmarks.yaml: |
+    ---
+    - Development:
+        - GitHub:
+            - icon: github.png
+              href: https://github.com
+        - GitLab:
+            - icon: gitlab.png
+              href: https://gitlab.com
+
+    - Documentation:
+        - Kubernetes:
+            - icon: kubernetes.png
+              href: https://kubernetes.io/docs
+        - Homepage Docs:
+            - icon: homepage.png
+              href: https://gethomepage.dev
+
+  kubernetes.yaml: |
+    ---
+    mode: cluster
+
+  docker.yaml: |
+    ---
+
+  proxmox.yaml: |
+    ---
+
+  custom.css: ""
+
+  custom.js: ""
