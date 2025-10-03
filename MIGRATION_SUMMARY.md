@@ -53,12 +53,23 @@ infrastructure/                   # Infrastructure components
 6. Pushes to main branch
 7. Flux reconciles new version to cluster (within 5 min)
 
-## Next Steps
+## Next Steps (NixOS)
 
-1. **Follow FLUX_SETUP.md** to bootstrap Flux on remote system
-2. **Verify** all resources are deployed correctly
-3. **Test** image automation by checking for auto-updates
-4. **Delete** k8s/ directory once validated:
+1. **Add fluxcd to your NixOS flake** (see nixos-flake-example.nix)
+   ```nix
+   environment.systemPackages = with pkgs; [ fluxcd kubectl ];
+   ```
+   ```bash
+   sudo nixos-rebuild switch --flake .#
+   ```
+
+2. **Follow FLUX_SETUP.md** to bootstrap Flux on remote system
+
+3. **Verify** all resources are deployed correctly
+
+4. **Test** image automation by checking for auto-updates
+
+5. **Delete** k8s/ directory once validated:
    ```bash
    git rm -r k8s/
    git commit -m "Remove old k8s directory"

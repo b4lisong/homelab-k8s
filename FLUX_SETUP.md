@@ -6,18 +6,40 @@
 2. **kubectl** configured with access to the cluster
 3. **GitHub personal access token** with repo permissions
 
-## Step 1: Install Flux CLI
+## Step 1: Install Flux CLI (NixOS)
 
-On your remote system, install the Flux CLI:
+### Option A: Declarative Installation (Recommended)
+
+Add to your NixOS flake configuration:
+
+```nix
+{
+  environment.systemPackages = with pkgs; [
+    fluxcd
+    kubectl
+  ];
+}
+```
+
+Then rebuild:
+```bash
+sudo nixos-rebuild switch --flake .#
+```
+
+### Option B: Temporary Shell (for testing)
 
 ```bash
-# For Linux/macOS using Homebrew
-brew install fluxcd/tap/flux
+nix shell nixpkgs#fluxcd nixpkgs#kubectl
+```
 
-# Or using curl
-curl -s https://fluxcd.io/install.sh | sudo bash
+### Option C: User Profile
 
-# Verify installation
+```bash
+nix profile install nixpkgs#fluxcd
+```
+
+Verify installation:
+```bash
 flux --version
 ```
 
