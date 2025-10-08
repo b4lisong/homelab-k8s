@@ -1,0 +1,13 @@
+apiVersion: tailscale.com/v1alpha1
+kind: Connector
+metadata:
+  name: ts-exit
+spec:
+  hostname: ts-exit
+  tags: ["tag:k8s"]
+  exitNode: true
+  subnetRouter:
+    advertiseRoutes:
+      - "10.0.20.0/24"
+      - "10.42.0.0/16"
+
