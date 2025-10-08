@@ -19,22 +19,33 @@ nix shell nixpkgs#fluxcd nixpkgs#kubectl
 flux --version
 ```
 
-### 2. Set Environment Variables
+### 2. Setup SSH Deploy Key
+
+**Generate SSH key:**
 ```bash
-export GITHUB_TOKEN=<your-github-token>
-export GITHUB_USER=<your-github-username>
-export GITHUB_REPO=homelab-k8s
+ssh-keygen -t ed25519 -C "flux-homelab-bh" -f ~/.ssh/flux-homelab-bh
+# Press Enter for no passphrase (Flux needs passwordless access)
+```
+
+**Add to GitHub:**
+```bash
+# Display public key
+cat ~/.ssh/flux-homelab-bh.pub
+
+# Then go to: https://github.com/YOUR-USERNAME/homelab-k8s/settings/keys
+# 1. Click "Add deploy key"
+# 2. Title: "Flux GitOps - bh cluster"
+# 3. Paste the public key
+# 4. ✅ Check "Allow write access" (required for image automation)
 ```
 
 ### 3. Bootstrap Flux
 ```bash
-flux bootstrap github \
-  --owner=$GITHUB_USER \
-  --repository=$GITHUB_REPO \
+flux bootstrap git \
+  --url=ssh://git@github.com/YOUR-USERNAME/homelab-k8s \
   --branch=main \
   --path=./clusters/bh \
-  --personal \
-  --context=bh
+  --private-key-file=~/.ssh/flux-homelab-bh
 ```
 
 ### 4. Verify

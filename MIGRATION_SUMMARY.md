@@ -63,13 +63,31 @@ infrastructure/                   # Infrastructure components
    sudo nixos-rebuild switch --flake .#
    ```
 
-2. **Follow FLUX_SETUP.md** to bootstrap Flux on remote system
+2. **Setup SSH Deploy Key** (on remote NixOS system)
+   ```bash
+   ssh-keygen -t ed25519 -C "flux-homelab-bh" -f ~/.ssh/flux-homelab-bh
+   cat ~/.ssh/flux-homelab-bh.pub
+   # Add to GitHub: Settings → Deploy keys (enable write access)
+   ```
 
-3. **Verify** all resources are deployed correctly
+3. **Bootstrap Flux** with SSH authentication
+   ```bash
+   flux bootstrap git \
+     --url=ssh://git@github.com/YOUR-USERNAME/homelab-k8s \
+     --branch=main \
+     --path=./clusters/bh \
+     --private-key-file=~/.ssh/flux-homelab-bh
+   ```
 
-4. **Test** image automation by checking for auto-updates
+4. **Verify** all resources are deployed correctly
+   ```bash
+   flux get all
+   kubectl get pods -n homepage
+   ```
 
-5. **Delete** k8s/ directory once validated:
+5. **Test** image automation by checking for auto-updates
+
+6. **Delete** k8s/ directory once validated:
    ```bash
    git rm -r k8s/
    git commit -m "Remove old k8s directory"

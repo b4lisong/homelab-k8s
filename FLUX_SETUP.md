@@ -43,15 +43,32 @@ Verify installation:
 flux --version
 ```
 
-## Step 2: Export GitHub Credentials
+## Step 2: Setup SSH Deploy Key
 
-Replace `<your-username>` and `<your-token>` with your actual values:
+SSH deploy keys are more secure than tokens for public repositories and are scoped to a single repository.
+
+### Generate SSH Key Pair
 
 ```bash
-export GITHUB_TOKEN=<your-token>
-export GITHUB_USER=<your-username>
-export GITHUB_REPO=homelab-k8s
+ssh-keygen -t ed25519 -C "flux-homelab-bh" -f ~/.ssh/flux-homelab-bh
+# Press Enter when prompted for passphrase (Flux requires passwordless access)
 ```
+
+### Add Public Key to GitHub
+
+```bash
+# Display the public key
+cat ~/.ssh/flux-homelab-bh.pub
+```
+
+Then:
+1. Go to your repository on GitHub: `https://github.com/YOUR-USERNAME/homelab-k8s`
+2. Navigate to **Settings** → **Deploy keys**
+3. Click **Add deploy key**
+4. **Title:** `Flux GitOps - bh cluster`
+5. **Key:** Paste the public key from above
+6. ✅ **Check "Allow write access"** (required for image update automation)
+7. Click **Add key**
 
 ## Step 3: Pre-flight Check
 
@@ -65,23 +82,25 @@ This should show all checks passing.
 
 ## Step 4: Bootstrap Flux
 
-Bootstrap Flux into your cluster. This will:
+Bootstrap Flux into your cluster using SSH authentication. This will:
 - Install Flux controllers in the `flux-system` namespace
-- Create a GitRepository resource pointing to this repo
+- Create a GitRepository resource pointing to this repo via SSH
+- Store the private key as a Kubernetes Secret
 - Commit the Flux manifests to `clusters/bh/flux-system/`
 - Set up reconciliation
 
 ```bash
-flux bootstrap github \
-  --owner=$GITHUB_USER \
-  --repository=$GITHUB_REPO \
+flux bootstrap git \
+  --url=ssh://git@github.com/YOUR-USERNAME/homelab-k8s \
   --branch=main \
   --path=./clusters/bh \
-  --personal \
-  --context=bh
+  --private-key-file=~/.ssh/flux-homelab-bh
 ```
 
-**Note**: If your kubeconfig context has a different name, replace `bh` in `--context=bh` with your actual context name.
+**Note**:
+- Replace `YOUR-USERNAME` with your actual GitHub username
+- If your kubeconfig context is not named `bh`, add `--context=your-context-name`
+- The private key will be stored in a Kubernetes Secret named `flux-system` in the `flux-system` namespace
 
 ## Step 5: Verify Installation
 
