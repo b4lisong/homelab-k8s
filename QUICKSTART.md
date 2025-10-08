@@ -53,13 +53,17 @@ flux bootstrap git \
 # Check Flux is running
 flux check
 
-# Watch deployment
+# Wait for infrastructure (including image automation controllers)
+kubectl wait --for=condition=ready kustomization/infrastructure -n flux-system --timeout=5m
+
+# Watch Homepage deployment
 kubectl get pods -n homepage --watch
 ```
 
 ### 5. Done!
+- Flux controllers installed (core + image automation)
 - Homepage should be running
-- Image automation is active
+- Image automation will activate after infrastructure deploys
 - Git is now your source of truth
 
 ## What You Get
