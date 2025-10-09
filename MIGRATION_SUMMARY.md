@@ -27,15 +27,14 @@ infrastructure/                   # Infrastructure components
 ### Key Changes
 
 1. **Homepage deployment.yaml** (apps/homepage/deployment.yaml:19)
-   - Added image policy marker: `# {"$imagepolicy": "flux-system:homepage"}`
-   - Enables automatic image updates
+   - Fixed version: `image: ghcr.io/gethomepage/homepage:v1.5.0`
+   - Update manually when you want to upgrade
 
 2. **Old k8s/ directory** - Keep until verified, then delete
 
-3. **Image automation enabled**
-   - Scans for new Homepage versions every 1 minute
-   - Auto-updates to versions matching `1.x.x` pattern
-   - Commits changes back to Git automatically
+3. **Simple GitOps workflow**
+   - Edit manifests → Commit → Push → Flux deploys
+   - No automatic image updates (keep it simple for learning)
 
 ## What Flux Will Do
 
@@ -44,14 +43,12 @@ infrastructure/                   # Infrastructure components
 - **Infrastructure**: Reconciles every 10 minutes
 - **Apps**: Reconciles every 5 minutes (after infrastructure is ready)
 
-### Image Automation Flow
-1. New Homepage v1.6.0 released
-2. ImageRepository detects it (within 1 min)
-3. ImagePolicy approves it (matches 1.x.x)
-4. ImageUpdateAutomation updates deployment.yaml
-5. Commits: `[ci skip] Update image ghcr.io/gethomepage/homepage:v1.6.0`
-6. Pushes to main branch
-7. Flux reconciles new version to cluster (within 5 min)
+### Manual Update Flow (When You Want to Upgrade)
+1. Edit `apps/homepage/deployment.yaml` - change image tag to new version
+2. Commit: `git commit -m "upgrade homepage to v1.6.0"`
+3. Push: `git push`
+4. Flux detects commit (within 1 min)
+5. Flux reconciles new version to cluster (within 5 min)
 
 ## Next Steps (NixOS)
 

@@ -61,17 +61,16 @@ kubectl get pods -n homepage --watch
 ```
 
 ### 5. Done!
-- Flux controllers installed (core + image automation)
+- Flux controllers installed
 - Homepage should be running
-- Image automation will activate after infrastructure deploys
 - Git is now your source of truth
 
 ## What You Get
 
 ✅ **Automatic deployments** - Push to Git → Deployed in 1-10 minutes
-✅ **Image updates** - New Homepage versions auto-deploy
 ✅ **Easy rollback** - Just `git revert` and push
 ✅ **Infrastructure as Code** - Everything in Git
+✅ **Manual version control** - Update image tags when you want to upgrade
 
 ## Testing It Works
 
@@ -89,14 +88,13 @@ git push
 flux logs --kind=Kustomization --name=apps --follow
 ```
 
-### Test Image Automation
+### Test Manual Update
 ```bash
 # Check current version
 kubectl get deployment homepage -n homepage -o jsonpath='{.spec.template.spec.containers[0].image}'
 
-# Watch for auto-updates (when new version releases)
-flux get image policy homepage
-flux get image update homepage
+# To upgrade: edit apps/homepage/deployment.yaml, change image tag, commit and push
+# Flux will deploy the new version automatically
 ```
 
 ## Troubleshooting One-Liners

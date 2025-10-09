@@ -16,7 +16,7 @@ spec:
       serviceAccountName: homepage
       containers:
       - name: homepage
-        image: ghcr.io/gethomepage/homepage:v1.5.0 # {"$imagepolicy": "flux-system:homepage"}
+        image: ghcr.io/gethomepage/homepage:v1.5.0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000
