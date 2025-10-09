@@ -129,7 +129,13 @@ flux resume kustomization apps
 ```
 clusters/bh/        → Flux configuration (don't touch after bootstrap)
 apps/              → Add your applications here
-infrastructure/    → Add infrastructure components here
+infrastructure/    → Add infrastructure components here (currently empty)
 ```
 
 When you add something to `apps/` or `infrastructure/`, Flux automatically deploys it within 1-10 minutes.
+
+## Next Steps
+
+- Add more apps to `apps/` directory
+- Install infrastructure (Traefik, cert-manager, etc.) when needed
+- Explore Flux documentation for advanced features
