@@ -1,25 +1,24 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: silverbullet
-  namespace: silverbullet
+  name: authelia
+  namespace: authelia
   annotations:
     cert-manager.io/cluster-issuer: "selfsigned-issuer"
-    traefik.ingress.kubernetes.io/router.middlewares: authelia-authelia-forwardauth@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
   - hosts:
-    - sb.bh.zz
-    secretName: silverbullet-tls
+    - auth.bh.zz
+    secretName: authelia-tls
   rules:
-  - host: sb.bh.zz
+  - host: auth.bh.zz
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: silverbullet
+            name: authelia
             port:
               number: 80
