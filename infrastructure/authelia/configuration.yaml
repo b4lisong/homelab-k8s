@@ -32,8 +32,13 @@ data:
       disable: false
       display_name: Homelab
       attestation_conveyance_preference: indirect
-      user_verification: preferred
+      selection_criteria:
+        user_verification: preferred
       timeout: 60s
+
+    identity_validation:
+      reset_password:
+        jwt_secret: insecure_jwt_secret_change_in_production
 
     authentication_backend:
       password_reset:
