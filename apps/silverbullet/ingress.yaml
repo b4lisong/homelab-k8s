@@ -3,8 +3,14 @@ kind: Ingress
 metadata:
   name: silverbullet
   namespace: silverbullet
+  annotations:
+    cert-manager.io/cluster-issuer: "selfsigned-issuer"
 spec:
   ingressClassName: traefik
+  tls:
+  - hosts:
+    - sb.bh.zz
+    secretName: silverbullet-tls
   rules:
   - host: sb.bh.zz
     http:

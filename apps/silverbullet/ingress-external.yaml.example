@@ -1,0 +1,36 @@
+# External domain ingress for Silverbullet
+#
+# ACTIVATION STEPS:
+# 1. Replace "your-domain.com" with your actual domain name
+# 2. Update the email in infrastructure/cert-manager/clusterissuers.yaml
+# 3. Ensure your domain's DNS A/AAAA record points to your public IP
+# 4. Configure port forwarding/tunnel to expose your cluster to the internet
+# 5. Rename this file to ingress-external.yaml
+# 6. Add "- ingress-external.yaml" to apps/silverbullet/kustomization.yaml
+# 7. Commit and push to Git
+# 8. cert-manager will automatically request a Let's Encrypt certificate
+#
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: silverbullet-external
+  namespace: silverbullet
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: traefik
+  tls:
+  - hosts:
+    - your-domain.com  # TODO: Replace with your actual domain
+    secretName: silverbullet-external-tls
+  rules:
+  - host: your-domain.com  # TODO: Replace with your actual domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: silverbullet
+            port:
+              number: 80
