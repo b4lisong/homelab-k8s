@@ -7,7 +7,6 @@ data:
   configuration.yml: |
     ---
     theme: light
-    default_2fa_method: totp
 
     server:
       address: 'tcp://0.0.0.0:9091/'
@@ -21,20 +20,10 @@ data:
         enabled: false
 
     totp:
-      disable: false
-      issuer: auth.bh.zz
-      algorithm: sha1
-      digits: 6
-      period: 30
-      skew: 1
+      disable: true
 
     webauthn:
-      disable: false
-      display_name: Homelab
-      attestation_conveyance_preference: indirect
-      selection_criteria:
-        user_verification: preferred
-      timeout: 60s
+      disable: true
 
     identity_validation:
       reset_password:
@@ -83,4 +72,4 @@ data:
         - domain: 'auth.bh.zz'
           policy: bypass
         - domain: '*.bh.zz'
-          policy: two_factor
+          policy: one_factor
