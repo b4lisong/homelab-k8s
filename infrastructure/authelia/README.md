@@ -151,10 +151,32 @@ session:
       remember_me: 1M  # "Remember me" duration
 ```
 
-### Adding More Users
+### Viewing and Modifying Users
 
-1. Generate new password hash (Step 1 above)
-2. Update the users_database.yml
+**To view current users:**
+
+```bash
+# Get and decode the current secret
+kubectl get secret authelia-users -n authelia -o jsonpath='{.data.users_database\.yml}' | base64 -d
+
+# Or save to file for editing
+kubectl get secret authelia-users -n authelia -o jsonpath='{.data.users_database\.yml}' | base64 -d > users_database.yml
+
+# View the file
+cat users_database.yml
+```
+
+**To add or modify users:**
+
+1. Generate new password hash for new/changed passwords:
+
+```bash
+docker run --rm ghcr.io/authelia/authelia:latest \
+  authelia crypto hash generate argon2 --password 'YourPassword'
+```
+
+2. Edit the users_database.yml file (add users, change passwords, etc.)
+
 3. Update the secret:
 
 ```bash
@@ -164,10 +186,16 @@ kubectl create secret generic authelia-users \
   --dry-run=client -o yaml | kubectl apply -f -
 ```
 
-4. Restart Authelia pod:
+4. Restart Authelia to pick up changes:
 
 ```bash
 kubectl rollout restart deployment/authelia -n authelia
+```
+
+5. Clean up local file:
+
+```bash
+rm users_database.yml
 ```
 
 ## Protecting Additional Services
