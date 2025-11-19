@@ -19,6 +19,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: authelia
+            name: authelia-svc
             port:
               number: 80

@@ -5,7 +5,7 @@ metadata:
   namespace: authelia
 spec:
   forwardAuth:
-    address: http://authelia.authelia.svc.cluster.local/api/authz/forward-auth
+    address: http://authelia-svc.authelia.svc.cluster.local/api/authz/forward-auth
     trustForwardHeader: true
     authResponseHeaders:
       - Remote-User
