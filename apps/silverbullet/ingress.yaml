@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: silverbullet
+  namespace: silverbullet
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: sb.bh.zz
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: silverbullet
+            port:
+              number: 80

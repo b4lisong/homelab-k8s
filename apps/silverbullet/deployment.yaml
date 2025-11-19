@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: silverbullet
+  namespace: silverbullet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: silverbullet
+  template:
+    metadata:
+      labels:
+        app: silverbullet
+    spec:
+      containers:
+      - name: silverbullet
+        image: ghcr.io/silverbulletmd/silverbullet:v2
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        volumeMounts:
+        - name: data
+          mountPath: /space
+      volumes:
+      - name: data
+        hostPath:
+          path: /mnt/nas/app_config/sb
+          type: DirectoryOrCreate
