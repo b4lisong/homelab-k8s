@@ -17,8 +17,6 @@ spec:
       - name: authelia
         image: ghcr.io/authelia/authelia:latest
         imagePullPolicy: IfNotPresent
-        args:
-          - --config=/config/configuration.yml
         ports:
         - containerPort: 9091
           name: http
