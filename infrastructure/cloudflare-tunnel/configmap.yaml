@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-config
+  namespace: cloudflare
+data:
+  config.yaml: |
+    # Ingress rules - route traffic to services
+    # Note: tunnel and credentials are provided via TUNNEL_TOKEN env var
+    ingress:
+      - hostname: sb.jlmitra.com
+        service: http://silverbullet.silverbullet.svc.cluster.local:80
+
+      - hostname: auth.jlmitra.com
+        service: http://authelia-svc.authelia.svc.cluster.local:80
+
+      # Catch-all rule
+      - service: http_status:404
