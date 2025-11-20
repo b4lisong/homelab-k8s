@@ -48,7 +48,8 @@ data:
     session:
       secret: insecure_session_secret
       cookies:
-        - name: authelia_session
+        # Local network cookie
+        - name: authelia_session_local
           domain: bh.zz
           authelia_url: https://auth.bh.zz
           default_redirection_url: https://home.bh.zz
@@ -56,6 +57,14 @@ data:
           inactivity: 5m
           remember_me: 1M
 
+        # Public internet cookie
+        - name: authelia_session_public
+          domain: jlmitra.com
+          authelia_url: https://auth.jlmitra.com
+          default_redirection_url: https://sb.jlmitra.com
+          expiration: 1h
+          inactivity: 5m
+          remember_me: 1M
     storage:
       encryption_key: insecure_encryption_key_change_me_in_production
       local:
