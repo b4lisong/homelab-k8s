@@ -227,71 +227,235 @@ Redirected back to → https://sb.yourdomain.com (authenticated)
 
 ### Step 3: Deploy Cloudflared in Kubernetes
 
-**Method 1: Using Helm (Recommended)**
+**Method 1: Flux HelmRelease (Recommended for GitOps)** ✅
+
+This keeps your token secure (not in Git) while maintaining GitOps principles.
+
+**Step 3a: Create token secret (once, manually)**
 
 ```bash
-# Add Cloudflare Helm repo
-helm repo add cloudflare https://cloudflare.github.io/helm-charts
-helm repo update
-
 # Create namespace
 kubectl create namespace cloudflare
 
-# Create secret with tunnel token
-kubectl create secret generic tunnel-credentials \
-  --from-literal=credentials.json='{"AccountTag":"YOUR_ACCOUNT_ID","TunnelSecret":"YOUR_SECRET","TunnelID":"YOUR_TUNNEL_ID"}' \
+# Create secret with tunnel token (NOT committed to Git)
+kubectl create secret generic cloudflared-token \
+  --from-literal=token="eyJhIjoiYmQ5..." \
   --namespace=cloudflare
 
-# Install cloudflared
-helm install cloudflared cloudflare/cloudflared \
-  --namespace cloudflare \
-  --set cloudflare.tunnelName=homelab-k8s \
-  --set cloudflare.token=YOUR_TUNNEL_TOKEN
+# Where to find token:
+# Dashboard → Zero Trust → Tunnels → Configure → Copy token
 ```
 
-**Method 2: Using Kubernetes Manifests**
+**Step 3b: Create GitOps manifests (commit these to Git)**
 
-Create `infrastructure/cloudflare-tunnel/deployment.yaml`:
-
+Create `infrastructure/cloudflare-tunnel/namespace.yaml`:
 ```yaml
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cloudflare
+```
+
+Create `infrastructure/cloudflare-tunnel/repository.yaml`:
+```yaml
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: cloudflare
+  namespace: flux-system
+spec:
+  interval: 24h
+  url: https://cloudflare.github.io/helm-charts
+```
+
+Create `infrastructure/cloudflare-tunnel/helmrelease.yaml`:
+```yaml
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
 metadata:
   name: cloudflared
   namespace: cloudflare
 spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: cloudflared
-  template:
-    metadata:
-      labels:
-        app: cloudflared
+  interval: 10m
+  chart:
     spec:
-      containers:
-      - name: cloudflared
-        image: cloudflare/cloudflared:latest
-        args:
-        - tunnel
-        - --no-autoupdate
-        - run
-        - --token
-        - YOUR_TUNNEL_TOKEN
-        livenessProbe:
-          httpGet:
-            path: /ready
-            port: 2000
-          failureThreshold: 1
-          initialDelaySeconds: 10
-          periodSeconds: 10
+      chart: cloudflared
+      version: '>=0.3.0'
+      sourceRef:
+        kind: HelmRepository
+        name: cloudflare
+        namespace: flux-system
+
+  # Pull token from secret (created manually above)
+  valuesFrom:
+  - kind: Secret
+    name: cloudflared-token
+    valuesKey: token
+    targetPath: cloudflare.token
+
+  # Additional values (optional)
+  values:
+    replicaCount: 2
 ```
 
-Apply:
-```bash
-kubectl create namespace cloudflare
-kubectl apply -f infrastructure/cloudflare-tunnel/
+Create `infrastructure/cloudflare-tunnel/kustomization.yaml`:
+```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - repository.yaml
+  - helmrelease.yaml
 ```
+
+Create `infrastructure/cloudflare-tunnel/README.md`:
+```markdown
+# Cloudflare Tunnel
+
+## Prerequisites
+
+Create the token secret manually (once):
+
+\`\`\`bash
+kubectl create secret generic cloudflared-token \
+  --from-literal=token="YOUR_TUNNEL_TOKEN" \
+  --namespace=cloudflare
+\`\`\`
+
+Get your token from: Cloudflare Dashboard → Zero Trust → Networks → Tunnels → Configure
+```
+
+**Step 3c: Deploy via Flux**
+
+```bash
+# Add to infrastructure kustomization
+# Edit infrastructure/kustomization.yaml and add:
+#   - cloudflare-tunnel
+
+# Commit to Git
+git add infrastructure/cloudflare-tunnel/
+git commit -m "Add Cloudflare Tunnel via Flux"
+git push
+
+# Flux will deploy automatically, or force reconciliation:
+flux reconcile kustomization infrastructure --with-source
+```
+
+---
+
+**Method 2: Direct Helm (Not for GitOps)** ⚠️
+
+⚠️ **Warning:** This bypasses Flux and exposes token in shell history. Only use for testing.
+
+```bash
+# Add repo
+helm repo add cloudflare https://cloudflare.github.io/helm-charts
+helm repo update
+
+# Install with token
+helm install cloudflared cloudflare/cloudflared \
+  --namespace cloudflare \
+  --create-namespace \
+  --set cloudflare.token="eyJhIjoiYmQ5..."
+```
+
+---
+
+**Method 3: SOPS Encrypted Secret (Advanced GitOps)** 🔐
+
+For fully reproducible GitOps with encrypted secrets in Git.
+
+**Prerequisites:**
+```bash
+# Install SOPS and age
+brew install sops age
+
+# Generate age key (save securely!)
+age-keygen -o age.key
+# Public key: age1abc123...
+```
+
+**Step 1: Configure Flux for SOPS decryption**
+
+```bash
+# Create secret with age private key
+cat age.key | kubectl create secret generic sops-age \
+  --namespace=flux-system \
+  --from-file=age.agekey=/dev/stdin
+
+# Update clusters/bh/infrastructure.yaml to enable decryption
+```
+
+Edit `clusters/bh/infrastructure.yaml`:
+```yaml
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: infrastructure
+  namespace: flux-system
+spec:
+  # ... existing config ...
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+```
+
+**Step 2: Create and encrypt the secret**
+
+```bash
+# Create secret manifest
+cat > infrastructure/cloudflare-tunnel/secret.yaml <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflared-token
+  namespace: cloudflare
+type: Opaque
+stringData:
+  token: "eyJhIjoiYmQ5..."
+EOF
+
+# Encrypt with SOPS
+sops --encrypt \
+  --age age1abc123... \
+  --encrypted-regex '^(data|stringData)$' \
+  infrastructure/cloudflare-tunnel/secret.yaml > infrastructure/cloudflare-tunnel/secret.enc.yaml
+
+# Remove plaintext
+rm infrastructure/cloudflare-tunnel/secret.yaml
+```
+
+**Step 3: Add encrypted secret to kustomization**
+
+Edit `infrastructure/cloudflare-tunnel/kustomization.yaml`:
+```yaml
+resources:
+  - namespace.yaml
+  - repository.yaml
+  - secret.enc.yaml  # Encrypted - safe to commit!
+  - helmrelease.yaml
+```
+
+**Step 4: Commit encrypted secret**
+
+```bash
+git add infrastructure/cloudflare-tunnel/
+git commit -m "Add Cloudflare Tunnel with SOPS encrypted token"
+git push
+```
+
+**Result:** Token is in Git (encrypted), Flux decrypts automatically. Fully reproducible!
+
+---
+
+**Comparison:**
+
+| Method | Secret in Git? | GitOps? | Complexity | Recommended For |
+|--------|---------------|---------|------------|-----------------|
+| Flux HelmRelease | ❌ No (manual) | ✅ Yes | Low | ✅ Most homelabs |
+| Direct Helm | ❌ No | ❌ No | Low | ⚠️ Testing only |
+| SOPS Encrypted | ✅ Encrypted | ✅ Yes | Medium | Production setups |
 
 ### Step 4: Configure Tunnel Routes
 
