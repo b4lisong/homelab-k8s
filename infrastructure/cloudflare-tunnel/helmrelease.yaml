@@ -35,6 +35,7 @@ spec:
       tunnelName: "homelab-k8s"
 
       # Ingress rules - what services to expose through the tunnel
+      # Note: Helm chart automatically adds catch-all rule
       ingress:
         # Expose Silverbullet
         - hostname: sb.jlmitra.com
@@ -43,6 +44,3 @@ spec:
         # Expose Authelia authentication portal
         - hostname: auth.jlmitra.com
           service: http://authelia-svc.authelia.svc.cluster.local:9091
-
-        # Catch-all rule (required) - returns 404 for unmatched requests
-        - service: http_status:404
