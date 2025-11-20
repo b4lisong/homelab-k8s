@@ -24,9 +24,9 @@ spec:
   values:
     replicaCount: 2
 
-    # Use GitHub Container Registry to avoid DNS issues with Docker Hub
+    # Use Docker Hub with explicit path
     image:
-      repository: ghcr.io/cloudflare/cloudflared
+      repository: docker.io/cloudflare/cloudflared
       tag: "latest"
 
     cloudflare:
