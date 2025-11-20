@@ -24,6 +24,11 @@ spec:
   values:
     replicaCount: 2
 
+    # Use GitHub Container Registry to avoid DNS issues with Docker Hub
+    image:
+      repository: ghcr.io/cloudflare/cloudflared
+      tag: "latest"
+
     cloudflare:
       account: "e21d62228b2de626a386eb1ed69292f5"
       tunnelId: "c4e17a2d-cdb2-4efb-ace9-682a6aa4304d"
