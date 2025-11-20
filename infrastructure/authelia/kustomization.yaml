@@ -8,3 +8,4 @@ resources:
   - ingress.yaml
   - ingress-external.yaml
   - middleware.yaml
+  - middleware-headers.yaml
