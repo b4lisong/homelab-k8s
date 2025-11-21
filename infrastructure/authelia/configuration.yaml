@@ -84,7 +84,14 @@ data:
     access_control:
       default_policy: deny
       rules:
+        # Local network access
         - domain: 'auth.bh.zz'
           policy: bypass
         - domain: '*.bh.zz'
+          policy: one_factor
+
+        # Public internet access
+        - domain: 'auth.jlmitra.com'
+          policy: bypass
+        - domain: '*.jlmitra.com'
           policy: one_factor
