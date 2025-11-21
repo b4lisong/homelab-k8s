@@ -95,3 +95,6 @@ data:
           policy: bypass
         - domain: '*.jlmitra.com'
           policy: one_factor
+          subject:
+            - "user:admin"
+            - "group:admins"
