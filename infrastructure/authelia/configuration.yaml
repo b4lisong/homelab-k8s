@@ -93,6 +93,16 @@ data:
         # Public internet access
         - domain: 'auth.jlmitra.com'
           policy: bypass
+
+        # Bypass auth for service workers and static assets
+        - domain: 'sb.jlmitra.com'
+          policy: bypass
+          resources:
+            - '^/service_worker\.js$'
+            - '^/.*\.woff2?$'
+            - '^/.*\.ttf$'
+            - '^/.*\.eot$'
+
         - domain: '*.jlmitra.com'
           policy: one_factor
           subject:
