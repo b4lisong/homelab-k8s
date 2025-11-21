@@ -33,7 +33,7 @@ data:
 
     identity_validation:
       reset_password:
-        jwt_secret: insecure_jwt_secret_change_in_production
+        # jwt_secret loaded from AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET env var
 
     authentication_backend:
       password_reset:
@@ -52,7 +52,7 @@ data:
             salt_length: 16
 
     session:
-      secret: insecure_session_secret
+      # secret loaded from AUTHELIA_SESSION_SECRET env var
       cookies:
         # Local network cookie
         - name: authelia_session_local
@@ -72,7 +72,7 @@ data:
           inactivity: 5m
           remember_me: 1M
     storage:
-      encryption_key: insecure_encryption_key_change_me_in_production
+      # encryption_key loaded from AUTHELIA_STORAGE_ENCRYPTION_KEY env var
       local:
         path: /config/db.sqlite3
 

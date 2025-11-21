@@ -24,6 +24,22 @@ spec:
         env:
         - name: TZ
           value: America/Los_Angeles
+        # Load secrets from authelia-secrets Secret
+        - name: AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: authelia-secrets
+              key: jwt-secret
+        - name: AUTHELIA_SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: authelia-secrets
+              key: session-secret
+        - name: AUTHELIA_STORAGE_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: authelia-secrets
+              key: encryption-key
         volumeMounts:
         - name: config
           mountPath: /config/configuration.yml
